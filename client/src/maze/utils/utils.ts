@@ -1,3 +1,5 @@
+import Cell from "@maze/helpers/cell";
+
 export type ShikariCanvas = {
     width: number;
     height: number;
@@ -13,5 +15,6 @@ export interface ShikariGrid {
 export interface ShikariCell {
     readonly posX: number;
     readonly posY: number;
+    visited: boolean;
     show: (c: HTMLCanvasElement) => void;
 }

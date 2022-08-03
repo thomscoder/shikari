@@ -1,4 +1,4 @@
-import { ShikariCell } from "@maze/utils/utils";
+import { ShikariCell, ShikariGrid } from "@maze/utils/utils";
 
 export default class Cell implements ShikariCell {
     public readonly posX: number;
@@ -12,6 +12,7 @@ export default class Cell implements ShikariCell {
         ["bottom", true], 
         ["left", true]
     ]);
+    public visited: boolean = false;
 
     constructor(public x: number, public y: number, public _delta: number) {
         this.posX = x;
@@ -33,12 +34,18 @@ export default class Cell implements ShikariCell {
         const ctx = c.getContext("2d");
         
         ctx?.beginPath();
-        ctx!.strokeStyle = "#fff";
         
+        ctx!.strokeStyle = "#fff";
+
         const self = this;
         renderWalls();
         // ctx?.rect(x, y, delta, delta);
         ctx?.stroke();
+
+        if (this.visited) {
+            ctx!.fillStyle = "#ff0000";
+            ctx!.fillRect(x, y, delta, delta);
+        }
 
         //Draw each walls separately
         function renderWalls() {
@@ -56,4 +63,5 @@ export default class Cell implements ShikariCell {
             if (self.walls.get("left")) ctx?.lineTo(x, y);
         }
     }
+
 }

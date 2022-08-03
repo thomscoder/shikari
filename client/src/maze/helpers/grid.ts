@@ -6,13 +6,15 @@ export default class Grid implements ShikariGrid {
     public readonly rows: number;
     private delta: number = 40;
     private grid: Array<Cell> = [];
+    private currentCell: Cell | undefined;
 
     constructor(width: number, height: number) {
         this.cols = Math.floor(width / this.delta);
         this.rows = Math.floor(height / this.delta);
+        this.currentCell = undefined;
     }
 
-    private generate() {
+    private generate(): void {
         // For each column, generate a row
         for (let i = 0; i < this.cols; i++) {
             for (let j = 0; j < this.rows; j++) {
@@ -22,12 +24,16 @@ export default class Grid implements ShikariGrid {
                 this.grid.push(cell);
             }
         }
+        
     }
 
-    public draw(el: HTMLCanvasElement) {
+    public draw(el: HTMLCanvasElement): void {
         this.generate();
+        this.currentCell = this.grid[0];
+
         // Display the cells
         for (let i = 0; i < this.grid.length; i++) {
+            this.currentCell!.visited = true;
             const cell = this.grid[i];
             cell.show(el);
         }
