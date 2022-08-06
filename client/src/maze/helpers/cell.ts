@@ -1,4 +1,4 @@
-import { ShikariCell, ShikariGrid } from "@maze/utils/utils";
+import { ShikariCell, ShikariGrid, ShikariWalls } from "@maze/utils/utils";
 
 export default class Cell implements ShikariCell {
     public readonly posX: number;
@@ -6,18 +6,21 @@ export default class Cell implements ShikariCell {
     // Delta represents the size of each cell
     private delta: number;
     // Each cell starts with all 4 walls: top, right, bottom, left
-    private walls: Map<string, boolean> = new Map([
-        ["top", true], 
-        ["right", true], 
-        ["bottom", true], 
-        ["left", true]
-    ]);
+    private walls: Map<string, boolean>;
+    private ctx: CanvasRenderingContext2D | null;
     public visited: boolean = false;
 
-    constructor(public x: number, public y: number, public _delta: number) {
-        this.posX = x;
-        this.posY = y;
+    constructor(public _x: number, public _y: number, public _delta: number) {
+        this.posX = _x;
+        this.posY = _y;
         this.delta = _delta;
+        this.walls = new Map([
+            ["top", true], 
+            ["right", true], 
+            ["bottom", true], 
+            ["left", true]
+        ]);
+        this.ctx = null;
     }
 
     public show(c: HTMLCanvasElement) {
@@ -27,67 +30,98 @@ export default class Cell implements ShikariCell {
         // y coordinate times delta
         const y = this.posY * this.delta;
         // Draw a rectangle at the calculated x and y coordinates
-        this.rect(x, y, this.delta, c);
+        this.rect(x, y, c);
     }
 
-    private rect(x: number, y: number, delta: number, c: HTMLCanvasElement) {
-        const ctx = c.getContext("2d");
+    private rect(x: number, y: number, c: HTMLCanvasElement) {
+        this.ctx = c.getContext("2d");
         
-        ctx?.beginPath();
+        this.ctx?.beginPath();
         
-        ctx!.strokeStyle = "#fff";
+        this.ctx!.strokeStyle = "#fff";
 
-        const self = this;
-        renderWalls();
-        // ctx?.rect(x, y, delta, delta);
-        ctx?.stroke();
+        // For debugging purposes
+        this.renderWalls(x, y);
+    }
 
-        if (this.visited) {
-            ctx!.fillStyle = "#ff0000";
-            ctx!.fillRect(x, y, delta, delta);
+    private renderWalls(x: number, y: number) {
+        const { delta } = this;
+        // top left corner
+        this.ctx?.moveTo(x, y);
+        if (this.walls.get("top")) {
+            this.ctx?.lineTo(x + delta, y);
+        }
+        // top right corner
+        this.ctx?.moveTo(x + delta, y);
+        if (this.walls.get("right")) {
+            this.ctx?.lineTo(x + delta, y + delta);
+        }
+        // bottom right corner
+        this.ctx?.moveTo(x + delta, y + delta);
+        if (this.walls.get("bottom")) {
+            this.ctx?.lineTo(x, y + delta);
+        }
+        // bottom left corner
+        this.ctx?.moveTo(x, y + delta);
+        if (this.walls.get("left")) {
+            this.ctx?.lineTo(x, y);
         }
 
-        //Draw each walls separately
-        function renderWalls() {
-            // top left corner
-            ctx?.moveTo(x, y);
-            if (self.walls.get("top")) ctx?.lineTo(x + delta, y);
-            // top right corner
-            ctx?.moveTo(x + delta, y);
-            if (self.walls.get("right")) ctx?.lineTo(x + delta, y + delta);
-            // bottom right corner
-            ctx?.moveTo(x + delta, y + delta);
-            if (self.walls.get("bottom")) ctx?.lineTo(x, y + delta);
-            // bottom left corner
-            ctx?.moveTo(x, y + delta);
-            if (self.walls.get("left")) ctx?.lineTo(x, y);
-        }
+        this.ctx?.stroke();
     }
 
     public wasVisited() {
+        const x = this.posX * this.delta;
+        const y = this.posY * this.delta;
+        
+        this.ctx!.fillStyle = "#a00000";
+        this.ctx!.clearRect(x, y, this.delta, this.delta);
+
         this.visited = true;
     }
 
-    private getNextCell(grid: Cell[], x: number, y: number, cells: Cell[]): (Cell | undefined) {
+    private getNext(grid: Cell[], x: number, y: number, result: Array<Cell>): Cell {
         const cell = grid.find(c => c.posX === x && c.posY === y);
-        if (!cell) return undefined;
-        cells.push(cell);
-        return cell;
+        if (cell && !cell.visited) result.push(cell);
+        return cell!;
     }
 
-    public getNextCells(grid: Cell[], width: number, height: number): (Cell | undefined) {
+    public getNeighbors(grid: Cell[], width: number, height: number): (Cell | undefined) {
         this.wasVisited();
-        const cells: Cell[] = [];
-        const top = this.getNextCell(grid, this.posX, this.posY - 1, cells);
-        const right = this.getNextCell(grid, this.posX + 1, this.posY, cells);
-        const bottom = this.getNextCell(grid, this.posX, this.posY + 1, cells);
-        const left = this.getNextCell(grid, this.posX - 1, this.posY, cells);
         
-        const nextCell = cells[Math.floor(Math.random() * cells.length)];
-        console.log(nextCell);
 
+        const neighbors: Cell[] = [];
+
+        const top = this.getNext(grid, this.posX, this.posY - 1, neighbors);
+        const right = this.getNext(grid, this.posX + 1, this.posY, neighbors);
+        const bottom = this.getNext(grid, this.posX, this.posY + 1, neighbors);
+        const left = this.getNext(grid, this.posX - 1, this.posY, neighbors);
+
+        const nextCell = neighbors[Math.floor(Math.random() * neighbors.length)];
+        
         if (!nextCell) return undefined;
+        this.removeWalls(this, nextCell);
+
         return nextCell;
+    }
+
+    private removeWalls(current: Cell, next: Cell) {
+        const x = current.posX - next.posX;
+        const y = current.posY - next.posY;
+
+        if (x === 1) {
+            current.walls.set("left", false);
+            next.walls.set("right", false);
+        } else if (x === -1) {
+            current.walls.set("right", false);
+            next.walls.set("left", false);
+        } else if (y === 1) {
+            current.walls.set("top", false);
+            next.walls.set("bottom", false);
+        } else if (y === -1) {
+            current.walls.set("bottom", false);
+            next.walls.set("top", false);
+        }
     }
 
 }

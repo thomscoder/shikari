@@ -1,5 +1,7 @@
 import Cell from "@maze/helpers/cell";
 
+export type ShikariWalls = Map<string, boolean>;
+
 export type ShikariCanvas = {
     width: number;
     height: number;
@@ -17,4 +19,6 @@ export interface ShikariCell {
     readonly posY: number;
     visited: boolean;
     show: (c: HTMLCanvasElement) => void;
+    getNeighbors: (grid: Cell[], width: number, height: number, cell: Cell) => void;
+    wasVisited: () => void;
 }
