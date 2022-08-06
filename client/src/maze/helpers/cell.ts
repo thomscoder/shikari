@@ -64,4 +64,30 @@ export default class Cell implements ShikariCell {
         }
     }
 
+    public wasVisited() {
+        this.visited = true;
+    }
+
+    private getNextCell(grid: Cell[], x: number, y: number, cells: Cell[]): (Cell | undefined) {
+        const cell = grid.find(c => c.posX === x && c.posY === y);
+        if (!cell) return undefined;
+        cells.push(cell);
+        return cell;
+    }
+
+    public getNextCells(grid: Cell[], width: number, height: number): (Cell | undefined) {
+        this.wasVisited();
+        const cells: Cell[] = [];
+        const top = this.getNextCell(grid, this.posX, this.posY - 1, cells);
+        const right = this.getNextCell(grid, this.posX + 1, this.posY, cells);
+        const bottom = this.getNextCell(grid, this.posX, this.posY + 1, cells);
+        const left = this.getNextCell(grid, this.posX - 1, this.posY, cells);
+        
+        const nextCell = cells[Math.floor(Math.random() * cells.length)];
+        console.log(nextCell);
+
+        if (!nextCell) return undefined;
+        return nextCell;
+    }
+
 }

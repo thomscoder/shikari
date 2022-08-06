@@ -37,5 +37,15 @@ export default class Grid implements ShikariGrid {
             const cell = this.grid[i];
             cell.show(el);
         }
+
+        this.visit(this.currentCell!);
+    }
+
+    private visit(cell: Cell) {
+        const next = cell.getNextCells(this.grid, this.cols, this.rows);
+        if (next) {
+            cell = next;
+            this.visit(cell);
+        }
     }
 }
