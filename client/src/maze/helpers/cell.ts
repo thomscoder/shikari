@@ -9,6 +9,7 @@ export default class Cell implements ShikariCell {
     private walls: Map<string, boolean>;
     private ctx: CanvasRenderingContext2D | null;
     public visited: boolean = false;
+    private canvasRef: HTMLCanvasElement | null = null;
 
     constructor(public _x: number, public _y: number, public _delta: number) {
         this.posX = _x;
@@ -24,6 +25,7 @@ export default class Cell implements ShikariCell {
     }
 
     public show(c: HTMLCanvasElement) {
+        if (!this.canvasRef) this.canvasRef = c;
         // calculate x coordinates for the cell
         // x coordinate times delta
         const x = this.posX * this.delta;
@@ -74,8 +76,7 @@ export default class Cell implements ShikariCell {
         const x = this.posX * this.delta;
         const y = this.posY * this.delta;
         
-        this.ctx!.fillStyle = "#a00000";
-        this.ctx!.clearRect(x, y, this.delta, this.delta);
+        this.redraw();
 
         this.visited = true;
     }
@@ -100,7 +101,7 @@ export default class Cell implements ShikariCell {
         const nextCell = neighbors[Math.floor(Math.random() * neighbors.length)];
         
         if (!nextCell) return undefined;
-        this.removeWalls(this, nextCell);
+        //this.removeWalls(this, nextCell);
 
         return nextCell;
     }
@@ -122,6 +123,26 @@ export default class Cell implements ShikariCell {
             current.walls.set("bottom", false);
             next.walls.set("top", false);
         }
+    }
+
+
+    clear() {
+        const x = this.posX * this.delta;
+        const y = this.posY * this.delta;
+        return this.ctx?.clearRect(x, y, this.delta, this.delta);
+    }
+
+    highlight() {
+        const x = this.posX * this.delta;
+        const y = this.posY * this.delta;
+        this.ctx!.fillStyle = "#a00";
+        this.ctx?.fillRect(x, y, this.delta, this.delta);
+    }
+
+    redraw() {
+        this.clear();
+        this.highlight();
+        this.show(this.canvasRef!);
     }
 
 }
