@@ -4,11 +4,13 @@ import Cell from "./cell";
 export default class Grid implements ShikariGrid {
     public readonly cols: number;
     public readonly rows: number;
-    private speed: number = 10;
+    private speed: number = 0;
     private delta: number = 20;
     private grid: Array<Cell> = [];
     private currentCell: Cell | undefined;
     private stack: Array<Cell> = [];
+    private canvasRef: HTMLCanvasElement | null = null;
+    private wasShuffled: boolean = false;
 
     constructor(width: number = 400, height: number = 400) {
         this.cols = Math.floor(width / this.delta);
@@ -30,23 +32,16 @@ export default class Grid implements ShikariGrid {
         
     }
 
-    public draw(el: HTMLCanvasElement): void {
-        this.generate();
+    private visit(cell: Cell) {
+        // Stop when shuffled
+        if (this.wasShuffled) return;
 
-        // Display the cells
-        for (let i = 0; i < this.grid.length; i++) {
-            const cell = this.grid[i];
-            cell.show(el);
-        }
-        this.visit(this.currentCell!);
-    }
-
-    public visit(cell: Cell) {
         const next = cell.getNeighbors(this.grid, this.cols, this.rows);
 
        if (next) {
             this.stack.push(cell);
             cell = next;
+            cell.colorReset();
             setTimeout(() => this.visit(cell), this.speed);
        } else {
             if (this.stack.length) {
@@ -56,5 +51,39 @@ export default class Grid implements ShikariGrid {
                 }
             }
        }
+    }
+
+    public draw(el: HTMLCanvasElement): boolean {
+        // Restart if shuffled
+        if (this.wasShuffled) {
+            this.wasShuffled = false;
+            this.stack = [];
+            this.currentCell = this.grid[0];
+        }
+
+        this.canvasRef = el;
+        this.generate();
+
+        // Display the cells
+        for (let i = 0; i < this.grid.length; i++) {
+            const cell = this.grid[i];
+            cell.show(el);
+        }
+        this.visit(this.currentCell!);
+        return true;
+    }
+
+    public shuffle(): boolean {
+        if (!this.canvasRef) return false;
+
+        // Clear the canvas
+        const context = this.canvasRef.getContext('2d');
+        context!.clearRect(0, 0, this.canvasRef.width, this.canvasRef.height);
+
+        // Shuffle the grid
+        this.grid = [];
+        this.generate();
+        this.wasShuffled = true;
+        return this.draw(this.canvasRef);
     }
 }

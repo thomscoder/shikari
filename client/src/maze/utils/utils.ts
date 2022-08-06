@@ -11,7 +11,8 @@ export type ShikariCanvas = {
 export interface ShikariGrid {
     readonly cols: number;
     readonly rows: number;
-    draw: (el: HTMLCanvasElement) => void;
+    draw: (el: HTMLCanvasElement) => boolean;
+    shuffle: () => boolean;
 }
 
 export interface ShikariCell {

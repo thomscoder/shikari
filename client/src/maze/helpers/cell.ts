@@ -10,11 +10,17 @@ export default class Cell implements ShikariCell {
     private ctx: CanvasRenderingContext2D | null;
     public visited: boolean = false;
     private canvasRef: HTMLCanvasElement | null = null;
+    private x: number;
+    private y: number;
 
     constructor(public _x: number, public _y: number, public _delta: number) {
         this.posX = _x;
         this.posY = _y;
         this.delta = _delta;
+
+        this.x = this.posX * this.delta;
+        this.y = this.posY * this.delta;
+
         this.walls = new Map([
             ["top", true], 
             ["right", true], 
@@ -28,9 +34,9 @@ export default class Cell implements ShikariCell {
         if (!this.canvasRef) this.canvasRef = c;
         // calculate x coordinates for the cell
         // x coordinate times delta
-        const x = this.posX * this.delta;
+        const x = this.x;
         // y coordinate times delta
-        const y = this.posY * this.delta;
+        const y = this.y;
         // Draw a rectangle at the calculated x and y coordinates
         this.rect(x, y, c);
     }
@@ -134,12 +140,20 @@ export default class Cell implements ShikariCell {
     }
 
     redraw() {
-        const x = this.posX * this.delta;
-        const y = this.posY * this.delta;
+        const x = this.x;
+        const y = this.y;
 
         this.clear(x, y);
         this.highlight(x, y);
         this.show(this.canvasRef!);
+    }
+
+    colorReset() {
+        const x = this.x;
+        const y = this.y;
+
+        this.ctx!.fillStyle = "#ff0";
+        this.ctx!.fillRect(x, y, this.delta, this.delta);
     }
 
 }
