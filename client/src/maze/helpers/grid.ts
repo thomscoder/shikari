@@ -4,8 +4,8 @@ import Cell from "./cell";
 export default class Grid implements ShikariGrid {
     public readonly cols: number;
     public readonly rows: number;
-    private speed: number = 200;
-    private delta: number = 40;
+    private speed: number = 10;
+    private delta: number = 20;
     private grid: Array<Cell> = [];
     private currentCell: Cell | undefined;
     private stack: Array<Cell> = [];

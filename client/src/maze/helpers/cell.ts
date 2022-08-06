@@ -42,7 +42,7 @@ export default class Cell implements ShikariCell {
         
         this.ctx!.strokeStyle = "#fff";
 
-        // For debugging purposes
+        // Draws each wall separately
         this.renderWalls(x, y);
     }
 
@@ -72,13 +72,11 @@ export default class Cell implements ShikariCell {
         this.ctx?.stroke();
     }
 
-    public wasVisited() {
-        const x = this.posX * this.delta;
-        const y = this.posY * this.delta;
-        
+    public wasVisited(): boolean {
+        // Clear and redraw each cell with updated walls
         this.redraw();
 
-        this.visited = true;
+        return this.visited = true;
     }
 
     private getNext(grid: Cell[], x: number, y: number, result: Array<Cell>): Cell {
@@ -101,7 +99,7 @@ export default class Cell implements ShikariCell {
         const nextCell = neighbors[Math.floor(Math.random() * neighbors.length)];
         
         if (!nextCell) return undefined;
-        //this.removeWalls(this, nextCell);
+        this.removeWalls(this, nextCell);
 
         return nextCell;
     }
@@ -126,22 +124,21 @@ export default class Cell implements ShikariCell {
     }
 
 
-    clear() {
-        const x = this.posX * this.delta;
-        const y = this.posY * this.delta;
+    private clear(x: number, y: number): void {
         return this.ctx?.clearRect(x, y, this.delta, this.delta);
     }
 
-    highlight() {
-        const x = this.posX * this.delta;
-        const y = this.posY * this.delta;
-        this.ctx!.fillStyle = "#a00";
+    highlight(x: number, y: number) {
+        this.ctx!.fillStyle = "#1e1e1e";
         this.ctx?.fillRect(x, y, this.delta, this.delta);
     }
 
     redraw() {
-        this.clear();
-        this.highlight();
+        const x = this.posX * this.delta;
+        const y = this.posY * this.delta;
+
+        this.clear(x, y);
+        this.highlight(x, y);
         this.show(this.canvasRef!);
     }
 

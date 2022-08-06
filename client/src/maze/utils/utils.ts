@@ -21,6 +21,5 @@ export interface ShikariCell {
     show: (c: HTMLCanvasElement) => void;
     getNeighbors: (grid: Cell[], width: number, height: number, cell: Cell) => void;
     wasVisited: () => boolean;
-    clear: () => void;
     redraw: () => void;
 }
