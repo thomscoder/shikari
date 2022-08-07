@@ -17,12 +17,30 @@ html, body {
   background-color: #1e1e1e;
 }
 
-.App .grid {
-  display: flex;
-  flex-wrap: wrap;
+.App {
+  text-align: center;
 }
 
 .App .cell {
   box-sizing: border-box;
   border: solid red;
+}
+
+.App form {
+  padding-top: 2rem;
+}
+
+.App form select {
+  padding: .4rem;
+    background-color: #1e1e1e;
+    outline: none;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 1rem;
+}
+
+.App form button {
+  margin-left: 1rem;
 }

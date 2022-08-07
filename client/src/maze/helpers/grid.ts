@@ -11,6 +11,8 @@ export default class Grid implements ShikariGrid {
     private stack: Array<Cell> = [];
     private canvasRef: HTMLCanvasElement | null = null;
     private wasShuffled: boolean = false;
+    private resolutionPath: Array<Cell> = [];
+    private count: number = 0;
 
     constructor(width: number = 400, height: number = 400) {
         this.cols = Math.floor(width / this.delta);
@@ -38,16 +40,26 @@ export default class Grid implements ShikariGrid {
 
         const next = cell.getNeighbors(this.grid);
 
+        if (cell === this.grid[this.grid.length - 1]) {
+            Object.freeze(this.resolutionPath);
+        }
+
+        const wasPathFound: boolean = Object.isFrozen(this.resolutionPath);
+
        if (next) {
             this.stack.push(cell);
+            if (!wasPathFound) this.resolutionPath.push(cell);
             cell = next;
             cell.colorReset();
             setTimeout(() => this.visit(cell), this.speed);
        } else {
             if (this.stack.length) {
                 const last = this.stack.pop();
+                if (!wasPathFound) this.resolutionPath.pop();
                 if (last) {
-                    setTimeout(() => this.visit(last), this.speed);
+                    setTimeout(() => {
+                        this.visit(last)
+                    }, this.speed);
                 }
             }
        }
@@ -67,7 +79,7 @@ export default class Grid implements ShikariGrid {
         // Display the cells
         for (let i = 0; i < this.grid.length; i++) {
             const cell = this.grid[i];
-            cell.show(el);
+            cell.show(el, false);
         }
         this.visit(this.currentCell!);
         return true;
@@ -85,5 +97,20 @@ export default class Grid implements ShikariGrid {
         this.generate();
         this.wasShuffled = true;
         return this.draw(this.canvasRef);
+    }
+
+    public pathFinder(): void {
+        if (this.count > this.resolutionPath.length) return;
+        
+        if (this.count  === this.resolutionPath.length) {
+            this.grid[this.grid.length - 1].pathColor();
+        }
+        this.pathHighlighter(this.resolutionPath[this.count]).next();
+        this.count++;
+        setTimeout(() => this.pathFinder(), this.speed);
+    }
+
+    private *pathHighlighter(c: Cell) {
+        if (c) c.pathColor();
     }
 }

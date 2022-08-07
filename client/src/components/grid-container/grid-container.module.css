@@ -1,3 +1,16 @@
-.gridContainer {
+canvas.gridContainer {
     background-color: #1e1e1e; 
+    padding: 2rem;
 }
+
+
+
+button {
+    padding: .4rem;
+    background-color: #1e1e1e;
+    outline: none;
+    border: .1px solid #fff;
+    color: #fff;
+    cursor: pointer;
+}
+
