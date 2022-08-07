@@ -91,7 +91,7 @@ export default class Cell implements ShikariCell {
         return cell!;
     }
 
-    public getNeighbors(grid: Cell[], width: number, height: number): (Cell | undefined) {
+    public getNeighbors(grid: Cell[]): (Cell | undefined) {
         this.wasVisited();
         
 
@@ -135,7 +135,7 @@ export default class Cell implements ShikariCell {
     }
 
     highlight(x: number, y: number) {
-        this.ctx!.fillStyle = "#1e1e1e";
+        this.ctx!.fillStyle = "#a00";
         this.ctx?.fillRect(x, y, this.delta, this.delta);
     }
 

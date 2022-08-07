@@ -13,6 +13,9 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+html, body {
+  background-color: #1e1e1e;
+}
 
 .App .grid {
   display: flex;

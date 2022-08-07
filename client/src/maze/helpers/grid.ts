@@ -5,7 +5,7 @@ export default class Grid implements ShikariGrid {
     public readonly cols: number;
     public readonly rows: number;
     private speed: number = 0;
-    private delta: number = 20;
+    private delta: number = 16;
     private grid: Array<Cell> = [];
     private currentCell: Cell | undefined;
     private stack: Array<Cell> = [];
@@ -36,7 +36,7 @@ export default class Grid implements ShikariGrid {
         // Stop when shuffled
         if (this.wasShuffled) return;
 
-        const next = cell.getNeighbors(this.grid, this.cols, this.rows);
+        const next = cell.getNeighbors(this.grid);
 
        if (next) {
             this.stack.push(cell);
