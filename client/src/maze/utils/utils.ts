@@ -5,6 +5,7 @@ export type ShikariWalls = Map<string, boolean>;
 export type ShikariCanvas = {
     width: number;
     height: number;
+    delta: number;
     id: string;
 }
 

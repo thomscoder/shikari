@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import classes from './grid-container.module.css';
 
 
-function GridContainer({width, height, id}: ShikariCanvas): JSX.Element {
-    const [grid, setGrid] = useState<Grid>(new Grid(width, height));
+function GridContainer({width, height, delta, id}: ShikariCanvas): JSX.Element {
+    const [grid, setGrid] = useState<Grid>(new Grid(width, height, delta));
 
     const shuffle = () => {
         grid.shuffle();

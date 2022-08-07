@@ -1,16 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GridContainer from "./components/grid-container/GridContainer";
 
 function App(): JSX.Element {
   const [drawGrid, setDrawGrid] = useState<number>(0);
+  const [gridSize, setGridSize] = useState<number>(0);
+  const [pathSize, setPathSize] = useState<number>(0);
 
   const createGrid = (e: any) => {
     e.preventDefault();
-    let el = document.getElementById("grid-size") as HTMLSelectElement;
-    let value = el.value;
-    let text = el.options[el.selectedIndex].text;
-    const size = parseInt(text);
-    setDrawGrid(size);
+    setDrawGrid(gridSize);
+    setPathSize(parseInt(e.target[1].value));
+  }
+
+  const setGSize = (e: any) => {
+    setGridSize(e.target.value);
+  }
+
+  const setPSize = (e: any) => {
   }
 
   const clear = () => {
@@ -20,18 +26,15 @@ function App(): JSX.Element {
   return (
     <div className="App">
       <form onSubmit={createGrid}>
-        <select id="grid-size" onSelect={createGrid} defaultValue="400">
-          <optgroup label="Select maze size">
-            <option value="800">800</option>
-            <option value="400">400</option>
-            <option value="200">200</option>
-          </optgroup>
-        </select>
+        <label htmlFor="grid-size">Maze Size</label>
+        <input type="number" name="grid-size" onChange={setGSize} min="200"/>
+        <label htmlFor="path-size">Path Width</label>
+        <input type="number" name="path-size" onChange={setPSize}/>
         <button type="submit">Create Maze</button>
       </form>
       {drawGrid !== 0 && 
         <>
-          <GridContainer width={drawGrid} height={drawGrid} id="grid-container" />
+          <GridContainer width={drawGrid} height={drawGrid} delta={pathSize} id="grid-container" />
           <button onClick={clear}>Clear</button>
         </>
   }

@@ -5,7 +5,7 @@ export default class Grid implements ShikariGrid {
     public readonly cols: number;
     public readonly rows: number;
     private speed: number = 0;
-    private delta: number = 16;
+    public delta: number;
     private grid: Array<Cell> = [];
     private currentCell: Cell | undefined;
     private stack: Array<Cell> = [];
@@ -14,9 +14,10 @@ export default class Grid implements ShikariGrid {
     private resolutionPath: Array<Cell> = [];
     private count: number = 0;
 
-    constructor(width: number = 400, height: number = 400) {
-        this.cols = Math.floor(width / this.delta);
-        this.rows = Math.floor(height / this.delta);
+    constructor(width: number = 400, height: number = 400, delta: number) {
+        this.delta = delta;
+        this.cols = Math.floor(width / delta);
+        this.rows = Math.floor(height / delta);
         this.currentCell = undefined;
     }
 
