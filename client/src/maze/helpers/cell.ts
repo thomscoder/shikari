@@ -30,18 +30,7 @@ export default class Cell implements ShikariCell {
         this.ctx = null;
     }
 
-    public show(c: HTMLCanvasElement) {
-        if (!this.canvasRef) this.canvasRef = c;
-        // calculate x coordinates for the cell
-        // x coordinate times delta
-        const x = this.x;
-        // y coordinate times delta
-        const y = this.y;
-        // Draw a rectangle at the calculated x and y coordinates
-        this.rect(x, y, c);
-    }
-
-    private rect(x: number, y: number, c: HTMLCanvasElement) {
+    private rect(x: number, y: number, c: HTMLCanvasElement, renderWalls: boolean = true) {
         this.ctx = c.getContext("2d");
         
         this.ctx?.beginPath();
@@ -49,7 +38,7 @@ export default class Cell implements ShikariCell {
         this.ctx!.strokeStyle = "#fff";
 
         // Draws each wall separately
-        this.renderWalls(x, y);
+        if (renderWalls) this.renderWalls(x, y);
     }
 
     private renderWalls(x: number, y: number) {
@@ -78,39 +67,13 @@ export default class Cell implements ShikariCell {
         this.ctx?.stroke();
     }
 
-    public wasVisited(): boolean {
-        // Clear and redraw each cell with updated walls
-        this.redraw();
-
-        return this.visited = true;
-    }
-
     private getNext(grid: Cell[], x: number, y: number, result: Array<Cell>): Cell {
         const cell = grid.find(c => c.posX === x && c.posY === y);
         if (cell && !cell.visited) result.push(cell);
         return cell!;
     }
 
-    public getNeighbors(grid: Cell[], width: number, height: number): (Cell | undefined) {
-        this.wasVisited();
-        
-
-        const neighbors: Cell[] = [];
-
-        const top = this.getNext(grid, this.posX, this.posY - 1, neighbors);
-        const right = this.getNext(grid, this.posX + 1, this.posY, neighbors);
-        const bottom = this.getNext(grid, this.posX, this.posY + 1, neighbors);
-        const left = this.getNext(grid, this.posX - 1, this.posY, neighbors);
-
-        const nextCell = neighbors[Math.floor(Math.random() * neighbors.length)];
-        
-        if (!nextCell) return undefined;
-        this.removeWalls(this, nextCell);
-
-        return nextCell;
-    }
-
-    private removeWalls(current: Cell, next: Cell) {
+        private removeWalls(current: Cell, next: Cell) {
         const x = current.posX - next.posX;
         const y = current.posY - next.posY;
 
@@ -134,12 +97,50 @@ export default class Cell implements ShikariCell {
         return this.ctx?.clearRect(x, y, this.delta, this.delta);
     }
 
-    highlight(x: number, y: number) {
-        this.ctx!.fillStyle = "#1e1e1e";
+
+    public show(c: HTMLCanvasElement, renderWalls: boolean = true) {
+        if (!this.canvasRef) this.canvasRef = c;
+        // calculate x coordinates for the cell
+        // x coordinate times delta
+        const x = this.x;
+        // y coordinate times delta
+        const y = this.y;
+        // Draw a rectangle at the calculated x and y coordinates
+        this.rect(x, y, c, renderWalls);
+    }
+
+    public wasVisited(): boolean {
+        // Clear and redraw each cell with updated walls
+        this.redraw();
+
+        return this.visited = true;
+    }
+
+    public getNeighbors(grid: Cell[]) {
+        this.wasVisited();
+        
+
+        const neighbors: Cell[] = [];
+
+        const top = this.getNext(grid, this.posX, this.posY - 1, neighbors);
+        const right = this.getNext(grid, this.posX + 1, this.posY, neighbors);
+        const bottom = this.getNext(grid, this.posX, this.posY + 1, neighbors);
+        const left = this.getNext(grid, this.posX - 1, this.posY, neighbors);
+
+        const nextCell = neighbors[Math.floor(Math.random() * neighbors.length)];
+        
+        if (!nextCell) return undefined;
+        this.removeWalls(this, nextCell);
+
+        return nextCell;
+    }
+
+    public highlight(x: number, y: number, color: string = "#1e1e1e"): void {
+        this.ctx!.fillStyle = color;
         this.ctx?.fillRect(x, y, this.delta, this.delta);
     }
 
-    redraw() {
+    public redraw(): void {
         const x = this.x;
         const y = this.y;
 
@@ -148,12 +149,20 @@ export default class Cell implements ShikariCell {
         this.show(this.canvasRef!);
     }
 
-    colorReset() {
+    public colorReset(): void {
         const x = this.x;
         const y = this.y;
 
-        this.ctx!.fillStyle = "#ff0";
+        this.ctx!.fillStyle = "#12fcd4";
         this.ctx!.fillRect(x, y, this.delta, this.delta);
     }
 
+    public pathColor(): void {
+        const x = this.x;
+        const y = this.y;
+
+        this.clear(x, y);
+        this.highlight(x, y, "#ff5b9b");
+        this.show(this.canvasRef!);
+    }
 }

@@ -14,15 +14,23 @@ function GridContainer({width, height, id}: ShikariCanvas): JSX.Element {
         setGrid(grid);
     }
 
+    const pathFinder = () => {
+        grid.pathFinder();
+        setGrid(grid);
+    }
+
     useEffect(() => {
         const canvas = document.getElementById(id) as HTMLCanvasElement;
         grid.draw(canvas);
     });
     return (
-        <>
+        <div className={classes.gridParentContainer}>
             <canvas id={id} width={width} height={height} className={classes.gridContainer}></canvas>
-            <button onClick={shuffle}>Shuffle</button>
-        </>
+            <div className={classes.gridControllers}>
+                <button onClick={shuffle}>Shuffle</button>
+                <button onClick={pathFinder}>Find Path</button>
+            </div>
+        </div>
     )
 }
 

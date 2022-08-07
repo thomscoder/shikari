@@ -13,6 +13,7 @@ export interface ShikariGrid {
     readonly rows: number;
     draw: (el: HTMLCanvasElement) => boolean;
     shuffle: () => boolean;
+    pathFinder: () => void;
 }
 
 export interface ShikariCell {
@@ -23,4 +24,7 @@ export interface ShikariCell {
     getNeighbors: (grid: Cell[], width: number, height: number, cell: Cell) => void;
     wasVisited: () => boolean;
     redraw: () => void;
+    highlight: (x: number, y: number, color: string) => void;
+    pathColor: () => void;
+    colorReset: () => void;
 }
