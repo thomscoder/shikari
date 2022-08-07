@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "commit": "cz",
-    "dev": "cd client && pnpm dev"
+    "dev": "cd client && pnpm dev",
+    "build": "cd client && pnpm build"
   },
   "config": {
     "commitizen": {
